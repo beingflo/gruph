@@ -1,38 +1,66 @@
-type Node<T> = T;
+type Node = usize;
 
-struct Edge<T> {
-    from:   Node<T>,
-    to:     Node<T>,
+pub struct NeighborIterator<'a> {
+    edges: &'a Vec<Edge>,
+    node: Node,
+    index: usize,
 }
 
-impl<T> Edge<T> {
-    fn new(from: Node<T>, to: Node<T>) -> Self {
+impl<'a> NeighborIterator<'a> {
+    fn new(edgelist: &'a EdgeList, node: Node) -> Self {
+        NeighborIterator { edges: edgelist.edges(), node, index: 0 }
+    }
+}
+
+impl<'a> Iterator for NeighborIterator<'a> {
+    type Item = Node;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        for idx in self.index..self.edges.len() {
+            if self.edges[idx].from == self.node {
+                self.index = idx+1;
+                return Some(self.edges[idx].to)
+            }
+        }
+
+        self.index = self.edges.len();
+        None
+    }
+}
+
+struct Edge {
+    from:   Node,
+    to:     Node,
+}
+
+impl Edge {
+    fn new(from: Node, to: Node) -> Self {
         Edge { from, to }
     }
 }
 
-pub struct EdgeList<T> {
-    edges: Vec<Edge<T>>,
+pub struct EdgeList {
+    edges: Vec<Edge>,
 }
 
-impl<T: PartialEq + Ord + Copy + Sized> EdgeList<T> {
+impl EdgeList {
     pub fn new() -> Self {
-        EdgeList::<T> { edges: vec![] }
+        EdgeList { edges: vec![] }
     }
 
     pub fn with_capacity(edges: usize) -> Self {
-        EdgeList::<T> { edges: Vec::with_capacity(edges) }
+        EdgeList { edges: Vec::with_capacity(edges) }
     }
 
     pub fn num_edges(&self) -> usize {
         self.edges.len()
     }
 
-    pub fn add_edge(&mut self, from: Node<T>, to: Node<T>) {
+    pub fn add_edge(&mut self, from: Node, to: Node) {
         self.edges.push(Edge::new(from, to));
     }
 
-    pub fn has_edge(&self, from: Node<T>, to: Node<T>) -> bool {
+    pub fn has_edge(&self, from: Node, to: Node) -> bool {
         for edge in &self.edges {
             if edge.from == from && edge.to == to {
                 return true;
@@ -42,12 +70,12 @@ impl<T: PartialEq + Ord + Copy + Sized> EdgeList<T> {
         false
     }
 
-    pub fn neighbors(&self, vertex: Node<T>) -> Vec<Node<T>> {
-        let mut neighbors: Vec<Node<T>> = self.edges.iter().filter(|e| e.from == vertex).map(|e| e.to).collect();
-        neighbors.sort();
-        neighbors.dedup();
+    pub fn neighbors<'a>(&'a self, vertex: Node) -> NeighborIterator<'a> {
+        NeighborIterator::new(self, vertex)
+    }
 
-        neighbors
+    fn edges(&self) -> &Vec<Edge> {
+        &self.edges
     }
 }
 
@@ -55,6 +83,7 @@ impl<T: PartialEq + Ord + Copy + Sized> EdgeList<T> {
 #[cfg(test)]
 mod tests {
     use EdgeList;
+    use Node;
 
     #[test]
     fn creation() {
@@ -92,11 +121,11 @@ mod tests {
         graph.add_edge(0,3);
         graph.add_edge(1,2);
 
-        assert_eq!(graph.neighbors(0), vec![1,2,3]);
+        assert_eq!(graph.neighbors(0).collect::<Vec<Node>>(), vec![1,2,3]);
     }
 
     #[test]
-    fn dedup_neighbors() {
+    fn multi_neighbors() {
         let mut graph = EdgeList::new();
         graph.add_edge(0,1);
         graph.add_edge(0,2);
@@ -106,6 +135,6 @@ mod tests {
         graph.add_edge(0,3);
         graph.add_edge(1,2);
 
-        assert_eq!(graph.neighbors(0), vec![1,2,3]);
+        assert_eq!(graph.neighbors(0).collect::<Vec<Node>>(), vec![1,2,2,3,3,3]);
     }
 }
