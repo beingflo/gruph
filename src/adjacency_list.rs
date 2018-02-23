@@ -1,47 +1,42 @@
-use std::cmp;
-
 use Graph;
 use Node;
+use std::slice;
+use std::cmp;
 
-struct Edge {
-    from:   Node,
-    to:     Node,
+pub struct AdjacencyList {
+    adj: Vec<Vec<Node>>,
+    num_nodes: usize,
 }
 
-impl Edge {
-    fn new(from: Node, to: Node) -> Self {
-        Edge { from, to }
-    }
-}
-
-pub struct EdgeList {
-    edges: Vec<Edge>,
-}
-
-impl EdgeList {
+impl AdjacencyList {
     pub fn new() -> Self {
-        EdgeList { edges: vec![] }
-    }
-
-    pub fn num_edges(&self) -> usize {
-        self.edges.len()
-    }
-
-    fn edges(&self) -> &Vec<Edge> {
-        &self.edges
+        AdjacencyList { adj: vec![], num_nodes: 0 }
     }
 }
 
-impl<'a> Graph<'a> for EdgeList {
-    type NeighborIterator = EdgeListNeighborIterator<'a>;
+impl<'a> Graph<'a> for AdjacencyList {
+    type NeighborIterator = slice::Iter<'a, Node>;
 
     fn add_edge(&mut self, from: Node, to: Node) {
-        self.edges.push(Edge::new(from, to));
+        if self.adj.len() <= from {
+            while self.adj.len() <= from {
+                self.adj.push(vec![]);
+            }
+        }
+
+        self.adj[from].push(to);
+
+        self.num_nodes = cmp::max(self.num_nodes, from);
+        self.num_nodes = cmp::max(self.num_nodes, to);
     }
 
     fn has_edge(&self, from: Node, to: Node) -> bool {
-        for edge in &self.edges {
-            if edge.from == from && edge.to == to {
+        if self.adj.len() <= from {
+            return false;
+        }
+
+        for u in &self.adj[from] {
+            if *u == to {
                 return true;
             }
         }
@@ -50,49 +45,15 @@ impl<'a> Graph<'a> for EdgeList {
     }
 
     fn neighbors(&'a self, vertex: Node) -> Self::NeighborIterator {
-        EdgeListNeighborIterator::new(self, vertex)
+        self.adj[vertex].iter()
     }
 
     fn num_nodes(&self) -> usize {
-        let mut max_node = 0;
-        for e in &self.edges {
-            max_node = cmp::max(max_node, e.from);
-            max_node = cmp::max(max_node, e.to);
-        }
-
-        if self.edges.len() > 0 {
-            max_node + 1
-        } else {
+        if self.adj.len() == 0 {
             0
+        } else {
+            self.num_nodes + 1
         }
-    }
-}
-
-pub struct EdgeListNeighborIterator<'a> {
-    edges: &'a Vec<Edge>,
-    node: Node,
-    index: usize,
-}
-
-impl<'a> EdgeListNeighborIterator<'a> {
-    fn new(edgelist: &'a EdgeList, node: Node) -> Self {
-        EdgeListNeighborIterator { edges: edgelist.edges(), node, index: 0 }
-    }
-}
-
-impl<'a> Iterator for EdgeListNeighborIterator<'a> {
-    type Item = &'a Node;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        for idx in self.index..self.edges.len() {
-            if self.edges[idx].from == self.node {
-                self.index = idx+1;
-                return Some(&self.edges[idx].to)
-            }
-        }
-
-        self.index = self.edges.len();
-        None
     }
 }
 
@@ -100,18 +61,18 @@ impl<'a> Iterator for EdgeListNeighborIterator<'a> {
 mod tests {
     use Graph;
     use Node;
-    use EdgeList;
+    use AdjacencyList;
 
     #[test]
     fn creation() {
-        let mut graph = EdgeList::new();
+        let mut graph = AdjacencyList::new();
         graph.add_edge(0,1);
         assert!(graph.has_edge(0, 1));
     }
 
     #[test]
     fn duplicate_edge() {
-        let mut graph = EdgeList::new();
+        let mut graph = AdjacencyList::new();
         graph.add_edge(0,1);
         graph.add_edge(0,1);
         graph.add_edge(0,1);
@@ -121,7 +82,7 @@ mod tests {
 
     #[test]
     fn reverse_edge() {
-        let mut graph = EdgeList::new();
+        let mut graph = AdjacencyList::new();
         graph.add_edge(0,1);
         graph.add_edge(1,2);
         assert!(graph.has_edge(0, 1));
@@ -132,7 +93,7 @@ mod tests {
 
     #[test]
     fn neighbors() {
-        let mut graph = EdgeList::new();
+        let mut graph = AdjacencyList::new();
         graph.add_edge(0,1);
         graph.add_edge(0,2);
         graph.add_edge(0,3);
@@ -143,7 +104,7 @@ mod tests {
 
     #[test]
     fn multi_neighbors() {
-        let mut graph = EdgeList::new();
+        let mut graph = AdjacencyList::new();
         graph.add_edge(0,1);
         graph.add_edge(0,2);
         graph.add_edge(0,2);
@@ -157,7 +118,7 @@ mod tests {
 
     #[test]
     fn num_nodes() {
-        let mut graph = EdgeList::new();
+        let mut graph = AdjacencyList::new();
         graph.add_edge(0,1);
         graph.add_edge(0,2);
         graph.add_edge(0,2);
@@ -171,13 +132,13 @@ mod tests {
 
     #[test]
     fn num_nodes_empty() {
-        let graph = EdgeList::new();
+        let graph = AdjacencyList::new();
         assert_eq!(graph.num_nodes(), 0);
     }
 
     #[test]
     fn num_nodes_large() {
-        let mut graph = EdgeList::new();
+        let mut graph = AdjacencyList::new();
 
         let num_nodes = 100;
 

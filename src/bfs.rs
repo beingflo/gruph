@@ -12,9 +12,9 @@ pub fn breadth_first_search<'a, T: Graph<'a>>(graph: &'a T, start: Node) -> Vec<
     while !q.is_empty() {
         let v = q.pop_back().unwrap();
         for u in graph.neighbors(v) {
-            if pred[u] == None {
-                pred[u] = Some(v);
-                q.push_front(u);
+            if pred[*u] == None {
+                pred[*u] = Some(v);
+                q.push_front(*u);
             }
         }
     }
