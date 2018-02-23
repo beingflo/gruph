@@ -1,6 +1,7 @@
-use Graph;
+use std::cmp;
 
-type Node = usize;
+use Graph;
+use Node;
 
 struct Edge {
     from:   Node,
@@ -36,7 +37,6 @@ impl EdgeList {
 }
 
 impl<'a> Graph<'a> for EdgeList {
-    type Node = Node;
     type NeighborIterator = EdgeListNeighborIterator<'a>;
 
     fn add_edge(&mut self, from: Node, to: Node) {
@@ -55,6 +55,20 @@ impl<'a> Graph<'a> for EdgeList {
 
     fn neighbors(&'a self, vertex: Node) -> Self::NeighborIterator {
         EdgeListNeighborIterator::new(self, vertex)
+    }
+
+    fn num_nodes(&self) -> usize {
+        let mut max_node = 0;
+        for e in &self.edges {
+            max_node = cmp::max(max_node, e.from);
+            max_node = cmp::max(max_node, e.to);
+        }
+
+        if self.edges.len() > 0 {
+            max_node + 1
+        } else {
+            0
+        }
     }
 }
 
@@ -89,6 +103,7 @@ impl<'a> Iterator for EdgeListNeighborIterator<'a> {
 #[cfg(test)]
 mod tests {
     use Graph;
+    use Node;
     use EdgeList;
 
     #[test]
@@ -127,7 +142,7 @@ mod tests {
         graph.add_edge(0,3);
         graph.add_edge(1,2);
 
-        assert_eq!(graph.neighbors(0).collect::<Vec<<EdgeList as Graph>::Node>>(), vec![1,2,3]);
+        assert_eq!(graph.neighbors(0).collect::<Vec<Node>>(), vec![1,2,3]);
     }
 
     #[test]
@@ -141,6 +156,41 @@ mod tests {
         graph.add_edge(0,3);
         graph.add_edge(1,2);
 
-        assert_eq!(graph.neighbors(0).collect::<Vec<<EdgeList as Graph>::Node>>(), vec![1,2,2,3,3,3]);
+        assert_eq!(graph.neighbors(0).collect::<Vec<Node>>(), vec![1,2,2,3,3,3]);
+    }
+
+    #[test]
+    fn num_nodes() {
+        let mut graph = EdgeList::new();
+        graph.add_edge(0,1);
+        graph.add_edge(0,2);
+        graph.add_edge(0,2);
+        graph.add_edge(0,3);
+        graph.add_edge(0,3);
+        graph.add_edge(0,3);
+        graph.add_edge(1,2);
+
+        assert_eq!(graph.num_nodes(), 4);
+    }
+
+    #[test]
+    fn num_nodes_empty() {
+        let graph = EdgeList::new();
+        assert_eq!(graph.num_nodes(), 0);
+    }
+
+    #[test]
+    fn num_nodes_large() {
+        let mut graph = EdgeList::new();
+
+        let num_nodes = 100;
+
+        for u in 0..100 {
+            for v in 0..100 {
+                graph.add_edge(u,v);
+            }
+        }
+
+        assert_eq!(graph.num_nodes(), num_nodes);
     }
 }

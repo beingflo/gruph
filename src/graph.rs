@@ -1,8 +1,10 @@
-pub trait Graph<'a> {
-    type Node;
-    type NeighborIterator: Iterator<Item=Self::Node>;
+pub type Node = usize;
 
-    fn add_edge(&mut self, from: Self::Node, to: Self::Node);
-    fn has_edge(&self, from: Self::Node, to: Self::Node) -> bool;
-    fn neighbors(&'a self, from: Self::Node) -> Self::NeighborIterator;
+pub trait Graph<'a> {
+    type NeighborIterator: Iterator<Item=Node>;
+
+    fn add_edge(&mut self, from: Node, to: Node);
+    fn has_edge(&self, from: Node, to: Node) -> bool;
+    fn neighbors(&'a self, from: Node) -> Self::NeighborIterator;
+    fn num_nodes(&self) -> usize;
 }
