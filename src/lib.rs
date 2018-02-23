@@ -1,18 +1,27 @@
+trait Graph<'a> {
+    type Node;
+    type NeighborIterator: Iterator<Item=Node>;
+
+    fn add_edge(&mut self, from: Node, to: Node);
+    fn has_edge(&self, from: Node, to: Node) -> bool;
+    fn neighbors(&'a self, from: Node) -> Self::NeighborIterator;
+}
+
 type Node = usize;
 
-pub struct NeighborIterator<'a> {
+pub struct EdgeListNeighborIterator<'a> {
     edges: &'a Vec<Edge>,
     node: Node,
     index: usize,
 }
 
-impl<'a> NeighborIterator<'a> {
+impl<'a> EdgeListNeighborIterator<'a> {
     fn new(edgelist: &'a EdgeList, node: Node) -> Self {
-        NeighborIterator { edges: edgelist.edges(), node, index: 0 }
+        EdgeListNeighborIterator { edges: edgelist.edges(), node, index: 0 }
     }
 }
 
-impl<'a> Iterator for NeighborIterator<'a> {
+impl<'a> Iterator for EdgeListNeighborIterator<'a> {
     type Item = Node;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -56,11 +65,20 @@ impl EdgeList {
         self.edges.len()
     }
 
-    pub fn add_edge(&mut self, from: Node, to: Node) {
+    fn edges(&self) -> &Vec<Edge> {
+        &self.edges
+    }
+}
+
+impl<'a> Graph<'a> for EdgeList {
+    type Node = Node;
+    type NeighborIterator = EdgeListNeighborIterator<'a>;
+
+    fn add_edge(&mut self, from: Node, to: Node) {
         self.edges.push(Edge::new(from, to));
     }
 
-    pub fn has_edge(&self, from: Node, to: Node) -> bool {
+    fn has_edge(&self, from: Node, to: Node) -> bool {
         for edge in &self.edges {
             if edge.from == from && edge.to == to {
                 return true;
@@ -70,18 +88,15 @@ impl EdgeList {
         false
     }
 
-    pub fn neighbors<'a>(&'a self, vertex: Node) -> NeighborIterator<'a> {
-        NeighborIterator::new(self, vertex)
-    }
-
-    fn edges(&self) -> &Vec<Edge> {
-        &self.edges
+    fn neighbors(&'a self, vertex: Node) -> Self::NeighborIterator {
+        EdgeListNeighborIterator::new(self, vertex)
     }
 }
 
 
 #[cfg(test)]
 mod tests {
+    use Graph;
     use EdgeList;
     use Node;
 
