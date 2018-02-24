@@ -55,6 +55,11 @@ impl<'a> Graph<'a> for AdjacencyList {
             self.num_nodes + 1
         }
     }
+
+    fn clear(&mut self) {
+        self.adj.clear();
+        self.num_nodes = 0;
+    }
 }
 
 #[cfg(test)]
@@ -140,7 +145,18 @@ mod tests {
     fn num_nodes_large() {
         let mut graph = AdjacencyList::new();
 
-        let num_nodes = 100;
+        for u in 0..100 {
+            for v in 0..100 {
+                graph.add_edge(u,v);
+            }
+        }
+
+        assert_eq!(graph.num_nodes(), 100);
+    }
+
+    #[test]
+    fn clear() {
+        let mut graph = AdjacencyList::new();
 
         for u in 0..100 {
             for v in 0..100 {
@@ -148,6 +164,8 @@ mod tests {
             }
         }
 
-        assert_eq!(graph.num_nodes(), num_nodes);
+        assert_eq!(graph.num_nodes(), 100);
+        graph.clear();
+        assert_eq!(graph.num_nodes(), 0);
     }
 }

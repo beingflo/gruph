@@ -7,4 +7,6 @@ pub trait Graph<'a> {
     fn has_edge(&self, from: Node, to: Node) -> bool;
     fn neighbors(&'a self, from: Node) -> Self::NeighborIterator;
     fn num_nodes(&self) -> usize;
+
+    fn clear(&mut self);
 }
