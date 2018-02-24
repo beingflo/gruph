@@ -61,7 +61,7 @@ impl<'a> Graph<'a> for AdjacencyList {
 mod tests {
     use Graph;
     use Node;
-    use AdjacencyList;
+    use representations::AdjacencyList;
 
     #[test]
     fn creation() {

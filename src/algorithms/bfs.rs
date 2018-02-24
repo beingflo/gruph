@@ -25,8 +25,8 @@ pub fn breadth_first_search<'a, T: Graph<'a>>(graph: &'a T, start: Node) -> Vec<
 #[cfg(test)]
 mod tests {
     use Graph;
-    use EdgeList;
-    use breadth_first_search;
+    use representations::EdgeList;
+    use algorithms::breadth_first_search;
 
     #[test]
     fn simple() {

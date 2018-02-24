@@ -100,7 +100,7 @@ impl<'a> Iterator for EdgeListNeighborIterator<'a> {
 mod tests {
     use Graph;
     use Node;
-    use EdgeList;
+    use representations::EdgeList;
 
     #[test]
     fn creation() {
