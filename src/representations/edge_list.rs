@@ -4,8 +4,6 @@ use Node;
 use Edge;
 
 use std::cmp;
-use std::iter;
-use std::slice;
 
 pub struct EdgeList {
     edges: Vec<Edge>,
@@ -19,7 +17,7 @@ impl EdgeList {
 
 impl<'a> QueryGraph<'a> for EdgeList {
     type NeighborIterator = EdgeListNeighborIterator<'a>;
-    type EdgeIterator = iter::Map<slice::Iter<'a, Edge>, fn(&Edge) -> Edge>;
+    type EdgeIterator = Box<Iterator<Item=Edge> + 'a>;
 
     fn has_edge(&self, from: Node, to: Node) -> bool {
         for edge in &self.edges {
@@ -36,7 +34,7 @@ impl<'a> QueryGraph<'a> for EdgeList {
     }
 
     fn edges(&'a self) -> Self::EdgeIterator {
-        self.edges.iter().map(|&e| e)
+        Box::new(self.edges.iter().map(|&e| e))
     }
 
     fn num_nodes(&self) -> usize {
@@ -69,7 +67,7 @@ impl<'a> Graph<'a> for EdgeList {
 }
 
 pub struct EdgeListNeighborIterator<'a> {
-    edges: iter::Map<slice::Iter<'a, Edge>, fn(&Edge) -> Edge>,
+    edges: Box<Iterator<Item=Edge> + 'a>,
     node: Node,
 }
 
@@ -98,6 +96,7 @@ mod tests {
     use QueryGraph;
     use Graph;
     use Node;
+    use Edge;
 
     use representations::EdgeList;
 
@@ -152,6 +151,21 @@ mod tests {
         graph.add_edge(1,2);
 
         assert_eq!(graph.neighbors(0).collect::<Vec<Node>>(), vec![1,2,2,3,3,3]);
+    }
+
+    #[test]
+    fn edges() {
+        let mut graph = EdgeList::new();
+        graph.add_edge(0,1);
+        graph.add_edge(0,2);
+        graph.add_edge(0,2);
+        graph.add_edge(0,3);
+        graph.add_edge(0,3);
+        graph.add_edge(0,3);
+        graph.add_edge(1,2);
+
+        assert_eq!(graph.edges().collect::<Vec<Edge>>()[6], Edge::new(1,2));
+        assert_eq!(graph.edges().collect::<Vec<Edge>>().len(), 7);
     }
 
     #[test]

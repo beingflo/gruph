@@ -1,6 +1,6 @@
 pub type Node = usize;
 
-#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Edge(Node, Node);
 
 impl Edge {

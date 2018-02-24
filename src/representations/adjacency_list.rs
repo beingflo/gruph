@@ -5,7 +5,6 @@ use Edge;
 
 use std::cmp;
 use std::iter;
-use std::slice;
 
 pub struct AdjacencyList {
     adj: Vec<Vec<Node>>,
@@ -19,8 +18,8 @@ impl AdjacencyList {
 }
 
 impl<'a> QueryGraph<'a> for AdjacencyList {
-    type NeighborIterator = iter::Map<slice::Iter<'a, Node>, fn(&Node) -> Node>;
-    type EdgeIterator = iter::Map<slice::Iter<'a, Edge>, fn(&Edge) -> Edge>;
+    type NeighborIterator = Box<Iterator<Item=Node> + 'a>;
+    type EdgeIterator = Box<Iterator<Item=Edge> + 'a>;
 
     fn has_edge(&self, from: Node, to: Node) -> bool {
         if self.adj.len() <= from {
@@ -37,11 +36,17 @@ impl<'a> QueryGraph<'a> for AdjacencyList {
     }
 
     fn neighbors(&'a self, vertex: Node) -> Self::NeighborIterator {
-        self.adj[vertex].iter().map(|&v| v)
+        Box::new(self.adj[vertex].iter().map(|&v| v))
     }
 
     fn edges(&'a self) -> Self::EdgeIterator {
-        unimplemented!()
+        let mut edges: Box<Iterator<Item=Edge>> = Box::new(iter::empty());
+
+        for (u, vec) in self.adj.iter().enumerate() {
+            edges = Box::new(edges.chain(vec.iter().map(move |&v| Edge::new(u, v))));
+        }
+
+        edges
     }
 
     fn num_nodes(&self) -> usize {
@@ -88,6 +93,7 @@ mod tests {
     use QueryGraph;
     use Graph;
     use Node;
+    use Edge;
 
     use representations::AdjacencyList;
 
@@ -142,6 +148,21 @@ mod tests {
         graph.add_edge(1,2);
 
         assert_eq!(graph.neighbors(0).collect::<Vec<Node>>(), vec![1,2,2,3,3,3]);
+    }
+
+    #[test]
+    fn edges() {
+        let mut graph = AdjacencyList::new();
+        graph.add_edge(0,1);
+        graph.add_edge(0,2);
+        graph.add_edge(0,2);
+        graph.add_edge(0,3);
+        graph.add_edge(0,3);
+        graph.add_edge(0,3);
+        graph.add_edge(1,2);
+
+        assert_eq!(graph.edges().collect::<Vec<Edge>>()[6], Edge::new(1,2));
+        assert_eq!(graph.edges().collect::<Vec<Edge>>().len(), 7);
     }
 
     #[test]
