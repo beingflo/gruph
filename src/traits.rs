@@ -17,7 +17,7 @@ impl Edge {
     }
 }
 
-pub trait QueryGraph<'a> {
+pub trait AccessGraph<'a> {
     type NeighborIterator: Iterator<Item=Node>;
     type EdgeIterator: Iterator<Item=Edge>;
 
@@ -30,7 +30,8 @@ pub trait QueryGraph<'a> {
     fn edges(&'a self) -> Self::EdgeIterator;
 }
 
-pub trait Graph<'a> : QueryGraph<'a> {
+pub trait Graph<'a> : AccessGraph<'a> {
+    fn new() -> Self;
     fn add_edge(&mut self, from: Node, to: Node);
     fn clear(&mut self);
 }

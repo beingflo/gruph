@@ -1,4 +1,4 @@
-use QueryGraph;
+use AccessGraph;
 use Graph;
 use Node;
 use Edge;
@@ -9,13 +9,7 @@ pub struct EdgeList {
     edges: Vec<Edge>,
 }
 
-impl EdgeList {
-    pub fn new() -> Self {
-        EdgeList { edges: vec![] }
-    }
-}
-
-impl<'a> QueryGraph<'a> for EdgeList {
+impl<'a> AccessGraph<'a> for EdgeList {
     type NeighborIterator = EdgeListNeighborIterator<'a>;
     type EdgeIterator = Box<Iterator<Item=Edge> + 'a>;
 
@@ -57,6 +51,10 @@ impl<'a> QueryGraph<'a> for EdgeList {
 }
 
 impl<'a> Graph<'a> for EdgeList {
+    fn new() -> Self {
+        EdgeList { edges: vec![] }
+    }
+
     fn add_edge(&mut self, from: Node, to: Node) {
         self.edges.push(Edge::new(from, to));
     }
@@ -93,7 +91,7 @@ impl<'a> Iterator for EdgeListNeighborIterator<'a> {
 
 #[cfg(test)]
 mod tests {
-    use QueryGraph;
+    use AccessGraph;
     use Graph;
     use Node;
     use Edge;

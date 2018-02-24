@@ -31,6 +31,7 @@ pub fn erdos<'a, T: Graph<'a>>(graph: &'a mut T, n: usize, p: f64) -> usize {
 
 #[cfg(test)]
 mod tests {
+    use Graph;
     use representations::EdgeList;
     use representations::AdjacencyList;
     use generators::erdos;

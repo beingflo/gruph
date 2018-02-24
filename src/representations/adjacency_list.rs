@@ -1,23 +1,16 @@
-use QueryGraph;
+use AccessGraph;
 use Graph;
 use Node;
 use Edge;
 
 use std::cmp;
-use std::iter;
 
 pub struct AdjacencyList {
     adj: Vec<Vec<Node>>,
     num_nodes: usize,
 }
 
-impl AdjacencyList {
-    pub fn new() -> Self {
-        AdjacencyList { adj: vec![], num_nodes: 0 }
-    }
-}
-
-impl<'a> QueryGraph<'a> for AdjacencyList {
+impl<'a> AccessGraph<'a> for AdjacencyList {
     type NeighborIterator = Box<Iterator<Item=Node> + 'a>;
     type EdgeIterator = Box<Iterator<Item=Edge> + 'a>;
 
@@ -40,13 +33,7 @@ impl<'a> QueryGraph<'a> for AdjacencyList {
     }
 
     fn edges(&'a self) -> Self::EdgeIterator {
-        let mut edges: Box<Iterator<Item=Edge>> = Box::new(iter::empty());
-
-        for (u, vec) in self.adj.iter().enumerate() {
-            edges = Box::new(edges.chain(vec.iter().map(move |&v| Edge::new(u, v))));
-        }
-
-        edges
+        Box::new(self.adj.iter().enumerate().flat_map(|(u, vec)| vec.iter().map(move |v| Edge::new(u, *v))))
     }
 
     fn num_nodes(&self) -> usize {
@@ -69,6 +56,10 @@ impl<'a> QueryGraph<'a> for AdjacencyList {
 }
 
 impl<'a> Graph<'a> for AdjacencyList {
+    fn new() -> Self {
+        AdjacencyList { adj: vec![], num_nodes: 0 }
+    }
+
     fn add_edge(&mut self, from: Node, to: Node) {
         if self.adj.len() <= from {
             while self.adj.len() <= from {
@@ -90,7 +81,7 @@ impl<'a> Graph<'a> for AdjacencyList {
 
 #[cfg(test)]
 mod tests {
-    use QueryGraph;
+    use AccessGraph;
     use Graph;
     use Node;
     use Edge;
