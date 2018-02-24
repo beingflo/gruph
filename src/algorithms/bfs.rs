@@ -1,8 +1,9 @@
-use std::collections::VecDeque;
-use Graph;
+use QueryGraph;
 use Node;
 
-pub fn breadth_first_search<'a, T: Graph<'a>>(graph: &'a T, start: Node) -> Vec<Option<Node>> {
+use std::collections::VecDeque;
+
+pub fn breadth_first_search<'a, T: QueryGraph<'a>>(graph: &'a T, start: Node) -> Vec<Option<Node>> {
     let mut q = VecDeque::new();
     let mut pred = vec![None; graph.num_nodes()];
 
@@ -12,9 +13,9 @@ pub fn breadth_first_search<'a, T: Graph<'a>>(graph: &'a T, start: Node) -> Vec<
     while !q.is_empty() {
         let v = q.pop_back().unwrap();
         for u in graph.neighbors(v) {
-            if pred[*u] == None {
-                pred[*u] = Some(v);
-                q.push_front(*u);
+            if pred[u] == None {
+                pred[u] = Some(v);
+                q.push_front(u);
             }
         }
     }
@@ -24,7 +25,9 @@ pub fn breadth_first_search<'a, T: Graph<'a>>(graph: &'a T, start: Node) -> Vec<
 
 #[cfg(test)]
 mod tests {
+    use QueryGraph;
     use Graph;
+
     use representations::EdgeList;
     use algorithms::breadth_first_search;
 

@@ -1,7 +1,11 @@
+use QueryGraph;
 use Graph;
 use Node;
-use std::slice;
+use Edge;
+
 use std::cmp;
+use std::iter;
+use std::slice;
 
 pub struct AdjacencyList {
     adj: Vec<Vec<Node>>,
@@ -14,21 +18,9 @@ impl AdjacencyList {
     }
 }
 
-impl<'a> Graph<'a> for AdjacencyList {
-    type NeighborIterator = slice::Iter<'a, Node>;
-
-    fn add_edge(&mut self, from: Node, to: Node) {
-        if self.adj.len() <= from {
-            while self.adj.len() <= from {
-                self.adj.push(vec![]);
-            }
-        }
-
-        self.adj[from].push(to);
-
-        self.num_nodes = cmp::max(self.num_nodes, from);
-        self.num_nodes = cmp::max(self.num_nodes, to);
-    }
+impl<'a> QueryGraph<'a> for AdjacencyList {
+    type NeighborIterator = iter::Map<slice::Iter<'a, Node>, fn(&Node) -> Node>;
+    type EdgeIterator = iter::Map<slice::Iter<'a, Edge>, fn(&Edge) -> Edge>;
 
     fn has_edge(&self, from: Node, to: Node) -> bool {
         if self.adj.len() <= from {
@@ -45,7 +37,11 @@ impl<'a> Graph<'a> for AdjacencyList {
     }
 
     fn neighbors(&'a self, vertex: Node) -> Self::NeighborIterator {
-        self.adj[vertex].iter()
+        self.adj[vertex].iter().map(|&v| v)
+    }
+
+    fn edges(&'a self) -> Self::EdgeIterator {
+        unimplemented!()
     }
 
     fn num_nodes(&self) -> usize {
@@ -56,6 +52,31 @@ impl<'a> Graph<'a> for AdjacencyList {
         }
     }
 
+    fn num_edges(&self) -> usize {
+        let mut num_edges = 0;
+        for v in &self.adj {
+            num_edges += v.len();
+        }
+
+        num_edges
+    }
+
+}
+
+impl<'a> Graph<'a> for AdjacencyList {
+    fn add_edge(&mut self, from: Node, to: Node) {
+        if self.adj.len() <= from {
+            while self.adj.len() <= from {
+                self.adj.push(vec![]);
+            }
+        }
+
+        self.adj[from].push(to);
+
+        self.num_nodes = cmp::max(self.num_nodes, from);
+        self.num_nodes = cmp::max(self.num_nodes, to);
+    }
+
     fn clear(&mut self) {
         self.adj.clear();
         self.num_nodes = 0;
@@ -64,8 +85,10 @@ impl<'a> Graph<'a> for AdjacencyList {
 
 #[cfg(test)]
 mod tests {
+    use QueryGraph;
     use Graph;
     use Node;
+
     use representations::AdjacencyList;
 
     #[test]
@@ -104,7 +127,7 @@ mod tests {
         graph.add_edge(0,3);
         graph.add_edge(1,2);
 
-        assert_eq!(graph.neighbors(0).collect::<Vec<&Node>>(), vec![&1,&2,&3]);
+        assert_eq!(graph.neighbors(0).collect::<Vec<Node>>(), vec![1,2,3]);
     }
 
     #[test]
@@ -118,7 +141,7 @@ mod tests {
         graph.add_edge(0,3);
         graph.add_edge(1,2);
 
-        assert_eq!(graph.neighbors(0).collect::<Vec<&Node>>(), vec![&1,&2,&2,&3,&3,&3]);
+        assert_eq!(graph.neighbors(0).collect::<Vec<Node>>(), vec![1,2,2,3,3,3]);
     }
 
     #[test]
