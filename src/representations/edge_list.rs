@@ -10,7 +10,7 @@ pub struct EdgeList {
 }
 
 impl<'a> AccessGraph<'a> for EdgeList {
-    type NeighborIterator = EdgeListNeighborIterator<'a>;
+    type NeighborIterator = Box<Iterator<Item=Node> + 'a>;
     type EdgeIterator = Box<Iterator<Item=Edge> + 'a>;
 
     fn has_edge(&self, from: Node, to: Node) -> bool {
@@ -24,7 +24,7 @@ impl<'a> AccessGraph<'a> for EdgeList {
     }
 
     fn neighbors(&'a self, vertex: Node) -> Self::NeighborIterator {
-        EdgeListNeighborIterator::new(self, vertex)
+        Box::new(self.edges.iter().filter(move |e| e.source() == vertex).map(|e| e.target()))
     }
 
     fn edges(&'a self) -> Self::EdgeIterator {
@@ -61,31 +61,6 @@ impl<'a> Graph<'a> for EdgeList {
 
     fn clear(&mut self) {
         self.edges.clear();
-    }
-}
-
-pub struct EdgeListNeighborIterator<'a> {
-    edges: Box<Iterator<Item=Edge> + 'a>,
-    node: Node,
-}
-
-impl<'a> EdgeListNeighborIterator<'a> {
-    fn new(edgelist: &'a EdgeList, node: Node) -> Self {
-        EdgeListNeighborIterator { edges: edgelist.edges(), node }
-    }
-}
-
-impl<'a> Iterator for EdgeListNeighborIterator<'a> {
-    type Item = Node;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        while let Some(e) = self.edges.next() {
-            if e.source() == self.node {
-                return Some(e.target());
-            }
-        }
-
-        None
     }
 }
 

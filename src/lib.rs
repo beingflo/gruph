@@ -7,4 +7,3 @@ pub use traits::Graph;
 pub use traits::AccessGraph;
 pub use traits::Node;
 pub use traits::Edge;
-
