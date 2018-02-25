@@ -1,3 +1,4 @@
+use AccessGraph;
 use Graph;
 use Node;
 use Edge;
@@ -5,96 +6,118 @@ use Edge;
 use representations::AdjacencyList;
 use representations::EdgeList;
 
+use generators::erdos;
+
 // AdjacencyList
 #[test]
-fn creation_adjacency_list() {
+fn creation_adjacencylist() {
     creation::<AdjacencyList>();
 }
 
 #[test]
-fn add_edges_adjacency_list() {
+fn add_edges_adjacencylist() {
     add_edges::<AdjacencyList>();
 }
 
 #[test]
-fn add_many_edges_adjacency_list() {
+fn add_many_edges_adjacencylist() {
     add_many_edges::<AdjacencyList>();
 }
 
 #[test]
-fn clear_graph_adjacency_list() {
+fn clear_graph_adjacencylist() {
     clear_graph::<AdjacencyList>();
 }
 
 #[test]
-fn duplicate_edge_adjacency_list() {
+fn duplicate_edge_adjacencylist() {
     duplicate_edge::<AdjacencyList>();
 }
 
 #[test]
-fn reverse_edge_adjacency_list() {
+fn reverse_edge_adjacencylist() {
     reverse_edge::<AdjacencyList>();
 }
 
 #[test]
-fn neighbors_adjacency_list() {
+fn neighbors_adjacencylist() {
     neighbors::<AdjacencyList>();
 }
 
 #[test]
-fn multi_neighbors_adjacency_list() {
+fn multi_neighbors_adjacencylist() {
     multi_neighbors::<AdjacencyList>();
 }
 
 #[test]
-fn edges_adjacency_list() {
+fn edges_adjacencylist() {
     edges::<AdjacencyList>();
+}
+
+#[test]
+fn to_edgelist_adjacencylist() {
+    to_edgelist::<AdjacencyList>();
+}
+
+#[test]
+fn to_adjacencylist_adjacencylist() {
+    to_adjacencylist::<AdjacencyList>();
 }
 
 // EdgeList
 #[test]
-fn creation_edge_list() {
+fn creation_edgelist() {
     creation::<EdgeList>();
 }
 
 #[test]
-fn add_edges_edge_list() {
+fn add_edges_edgelist() {
     add_edges::<EdgeList>();
 }
 
 #[test]
-fn add_many_edges_edge_list() {
+fn add_many_edges_edgelist() {
     add_many_edges::<EdgeList>();
 }
 
 #[test]
-fn clear_graph_edge_list() {
+fn clear_graph_edgelist() {
     clear_graph::<EdgeList>();
 }
 
 #[test]
-fn duplicate_edge_edge_list() {
+fn duplicate_edge_edgelist() {
     duplicate_edge::<EdgeList>();
 }
 
 #[test]
-fn reverse_edge_edge_list() {
+fn reverse_edge_edgelist() {
     reverse_edge::<EdgeList>();
 }
 
 #[test]
-fn neighbors_edge_list() {
+fn neighbors_edgelist() {
     neighbors::<EdgeList>();
 }
 
 #[test]
-fn multi_neighbors_edge_list() {
+fn multi_neighbors_edgelist() {
     multi_neighbors::<EdgeList>();
 }
 
 #[test]
-fn edges_edge_list() {
+fn edges_edgelist() {
     edges::<EdgeList>();
+}
+
+#[test]
+fn to_edgelist_edgelist() {
+    to_edgelist::<EdgeList>();
+}
+
+#[test]
+fn to_adjacencylist_edgelist() {
+    to_adjacencylist::<EdgeList>();
 }
 
 fn creation<T: Graph>() {
@@ -224,4 +247,48 @@ fn edges<T: Graph>() {
 
     assert_eq!(graph.edges().collect::<Vec<Edge>>()[6], Edge::new(1,2));
     assert_eq!(graph.edges().collect::<Vec<Edge>>().len(), 7);
+}
+
+fn to_edgelist<T: Graph>() where T: Into<EdgeList> {
+    let mut graph = T::new();
+
+    for u in 0..100 {
+        for v in 0..100 {
+            graph.add_edge(u, v);
+        }
+    }
+
+    let edges = graph.edges().collect::<Vec<Edge>>();
+    let edgelist: EdgeList = graph.into();
+    let edges_edgelist = edgelist.edges().collect::<Vec<Edge>>();
+
+    assert_eq!(edges, edges_edgelist);
+}
+
+fn to_adjacencylist<T: Graph>() where T: Into<AdjacencyList> {
+    let mut graph = T::new();
+
+    for u in 0..100 {
+        for v in 0..100 {
+            graph.add_edge(u, v);
+        }
+    }
+
+    let edges = graph.edges().collect::<Vec<Edge>>();
+    let adjacencylist: AdjacencyList = graph.into();
+    let edges_adjacencylist = adjacencylist.edges().collect::<Vec<Edge>>();
+
+    assert_eq!(edges, edges_adjacencylist);
+}
+
+#[test]
+fn conversion_bfs() {
+    let mut al = AdjacencyList::new();
+    erdos(&mut al, 1000, 0.01);
+
+    let pred_al = al.breadth_first_search(123);
+    let el: EdgeList = al.into();
+    let pred_el = el.breadth_first_search(123);
+
+    assert_eq!(pred_al, pred_el);
 }

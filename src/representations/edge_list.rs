@@ -3,8 +3,12 @@ use Graph;
 use Node;
 use Edge;
 
-use std::cmp;
+use representations::AdjacencyList;
 
+use std::cmp;
+use std::convert::From;
+
+#[derive(Clone)]
 pub struct EdgeList {
     edges: Vec<Edge>,
 }
@@ -59,5 +63,17 @@ impl Graph for EdgeList {
 
     fn clear(&mut self) {
         self.edges.clear();
+    }
+}
+
+impl From<AdjacencyList> for EdgeList {
+    fn from(other: AdjacencyList) -> Self {
+        let mut graph = EdgeList::new();
+
+        for e in other.edges() {
+            graph.add_edge(e.source(), e.target());
+        }
+
+        graph
     }
 }
