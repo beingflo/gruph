@@ -1,3 +1,5 @@
+use algorithms::breadth_first_search;
+
 pub type Node = usize;
 
 #[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Debug)]
@@ -25,6 +27,10 @@ pub trait AccessGraph {
 
     fn neighbors<'a>(&'a self, from: Node) -> Box<Iterator<Item=Node> + 'a>;
     fn edges<'a>(&'a self) -> Box<Iterator<Item=Edge> + 'a>;
+
+    fn breadth_first_search(&self, start: Node) -> Vec<Option<Node>> where Self: Sized {
+        breadth_first_search(self, start)
+    }
 }
 
 pub trait Graph : AccessGraph {

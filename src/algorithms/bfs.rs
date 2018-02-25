@@ -41,6 +41,20 @@ mod tests {
     }
 
     #[test]
+    fn call_syntax() {
+        let mut graph = EdgeList::new();
+
+        for u in 0..10 {
+            for v in 0..10 {
+                graph.add_edge(u,v);
+            }
+        }
+
+        assert_eq!(graph.breadth_first_search(0), breadth_first_search(&graph, 0));
+        assert_eq!(graph.breadth_first_search(7), breadth_first_search(&graph, 7));
+    }
+
+    #[test]
     fn complete_graph() {
         let mut graph = EdgeList::new();
 
