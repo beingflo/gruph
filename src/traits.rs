@@ -20,6 +20,8 @@ impl Edge {
 }
 
 pub trait AccessGraph {
+    fn from_graph<T: Graph>(graph: &T) -> Self where Self: Sized;
+
     fn num_nodes(&self) -> usize;
     fn num_edges(&self) -> usize;
 

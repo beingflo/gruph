@@ -3,10 +3,7 @@ use Graph;
 use Node;
 use Edge;
 
-use representations::AdjacencyList;
-
 use std::cmp;
-use std::convert::From;
 
 #[derive(Clone)]
 pub struct EdgeList {
@@ -14,6 +11,16 @@ pub struct EdgeList {
 }
 
 impl AccessGraph for EdgeList {
+    fn from_graph<T: Graph>(graph: &T) -> Self {
+        let mut el = EdgeList::new();
+
+        for e in graph.edges() {
+            el.add_edge(e.source(), e.target());
+        }
+
+        el
+    }
+
     fn num_nodes(&self) -> usize {
         let mut max_node = 0;
         for e in &self.edges {
@@ -63,17 +70,5 @@ impl Graph for EdgeList {
 
     fn clear(&mut self) {
         self.edges.clear();
-    }
-}
-
-impl From<AdjacencyList> for EdgeList {
-    fn from(other: AdjacencyList) -> Self {
-        let mut graph = EdgeList::new();
-
-        for e in other.edges() {
-            graph.add_edge(e.source(), e.target());
-        }
-
-        graph
     }
 }

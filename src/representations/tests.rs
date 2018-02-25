@@ -249,7 +249,7 @@ fn edges<T: Graph>() {
     assert_eq!(graph.edges().collect::<Vec<Edge>>().len(), 7);
 }
 
-fn to_edgelist<T: Graph>() where T: Into<EdgeList> {
+fn to_edgelist<T: Graph>() {
     let mut graph = T::new();
 
     for u in 0..100 {
@@ -259,13 +259,13 @@ fn to_edgelist<T: Graph>() where T: Into<EdgeList> {
     }
 
     let edges = graph.edges().collect::<Vec<Edge>>();
-    let edgelist: EdgeList = graph.into();
+    let edgelist = EdgeList::from_graph(&graph);
     let edges_edgelist = edgelist.edges().collect::<Vec<Edge>>();
 
     assert_eq!(edges, edges_edgelist);
 }
 
-fn to_adjacencylist<T: Graph>() where T: Into<AdjacencyList> {
+fn to_adjacencylist<T: Graph>() {
     let mut graph = T::new();
 
     for u in 0..100 {
@@ -275,7 +275,7 @@ fn to_adjacencylist<T: Graph>() where T: Into<AdjacencyList> {
     }
 
     let edges = graph.edges().collect::<Vec<Edge>>();
-    let adjacencylist: AdjacencyList = graph.into();
+    let adjacencylist = AdjacencyList::from_graph(&graph);
     let edges_adjacencylist = adjacencylist.edges().collect::<Vec<Edge>>();
 
     assert_eq!(edges, edges_adjacencylist);
@@ -287,7 +287,7 @@ fn conversion_bfs() {
     erdos(&mut al, 1000, 0.01);
 
     let pred_al = al.breadth_first_search(123);
-    let el: EdgeList = al.into();
+    let el = EdgeList::from_graph(&al);
     let pred_el = el.breadth_first_search(123);
 
     assert_eq!(pred_al, pred_el);
