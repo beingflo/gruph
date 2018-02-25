@@ -10,7 +10,7 @@ use Graph;
 /// with **n** nodes and an edge probability
 /// of **p**.
 ///
-pub fn erdos<'a, T: Graph<'a>>(graph: &'a mut T, n: usize, p: f64) -> usize {
+pub fn erdos<T: Graph>(graph: &mut T, n: usize, p: f64) -> usize {
     graph.clear();
 
     let mut rng = rand::thread_rng();

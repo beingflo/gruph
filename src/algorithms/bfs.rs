@@ -3,7 +3,7 @@ use Node;
 
 use std::collections::VecDeque;
 
-pub fn breadth_first_search<'a, T: AccessGraph<'a>>(graph: &'a T, start: Node) -> Vec<Option<Node>> {
+pub fn breadth_first_search<T: AccessGraph>(graph: &T, start: Node) -> Vec<Option<Node>> {
     let mut q = VecDeque::new();
     let mut pred = vec![None; graph.num_nodes()];
 

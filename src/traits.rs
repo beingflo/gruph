@@ -17,20 +17,17 @@ impl Edge {
     }
 }
 
-pub trait AccessGraph<'a> {
-    type NeighborIterator: Iterator<Item=Node>;
-    type EdgeIterator: Iterator<Item=Edge>;
-
-    fn has_edge(&self, from: Node, to: Node) -> bool;
-    fn neighbors(&'a self, from: Node) -> Self::NeighborIterator;
-
+pub trait AccessGraph {
     fn num_nodes(&self) -> usize;
     fn num_edges(&self) -> usize;
 
-    fn edges(&'a self) -> Self::EdgeIterator;
+    fn has_edge(&self, from: Node, to: Node) -> bool;
+
+    fn neighbors<'a>(&'a self, from: Node) -> Box<Iterator<Item=Node> + 'a>;
+    fn edges<'a>(&'a self) -> Box<Iterator<Item=Edge> + 'a>;
 }
 
-pub trait Graph<'a> : AccessGraph<'a> {
+pub trait Graph : AccessGraph {
     fn new() -> Self;
     fn add_edge(&mut self, from: Node, to: Node);
     fn clear(&mut self);
