@@ -1,5 +1,5 @@
-pub mod edge_list;
-pub mod adjacency_list;
+mod edge_list;
+mod adjacency_list;
 
 #[cfg(test)]
 mod tests;

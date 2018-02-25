@@ -1,3 +1,3 @@
-pub mod bfs;
+mod bfs;
 
 pub use self::bfs::breadth_first_search;

@@ -1,4 +1,4 @@
-pub mod traits;
+mod traits;
 pub mod algorithms;
 pub mod representations;
 pub mod generators;

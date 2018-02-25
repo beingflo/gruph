@@ -35,6 +35,7 @@ mod tests {
     use representations::EdgeList;
     use representations::AdjacencyList;
     use generators::erdos;
+    use algorithms::breadth_first_search;
 
     #[test]
     fn creation_edgelist() {
@@ -54,5 +55,31 @@ mod tests {
         // Very unlikely to be wrong without implementation bug
         assert!(edges > 450_000);
         assert!(edges < 550_000);
+    }
+
+    #[test]
+    fn bfs_edgelist() {
+        let mut graph = EdgeList::new();
+        let edges = erdos(&mut graph, 1000, 0.01);
+
+        let pred = breadth_first_search(&mut graph, 0);
+
+        assert!(edges > 9_000);
+        assert!(edges < 11_000);
+        assert!(pred[0].is_some());
+        assert_eq!(pred[0].unwrap(), 0);
+    }
+
+    #[test]
+    fn bfs_adjacencylist() {
+        let mut graph = AdjacencyList::new();
+        let edges = erdos(&mut graph, 1000, 0.01);
+
+        let pred = breadth_first_search(&mut graph, 0);
+
+        assert!(edges > 9_000);
+        assert!(edges < 11_000);
+        assert!(pred[0].is_some());
+        assert_eq!(pred[0].unwrap(), 0);
     }
 }
