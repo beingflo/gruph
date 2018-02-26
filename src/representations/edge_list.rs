@@ -18,7 +18,7 @@ impl Generator for EdgeList {
 }
 
 impl StaticGraph for EdgeList {
-    fn from_generator<T: Generator>(gen: T) -> Self {
+    fn from_generator<T: Generator>(gen: &T) -> Self {
         let mut el = EdgeList::new();
 
         for e in gen.edges() {

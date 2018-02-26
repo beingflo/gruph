@@ -24,7 +24,7 @@ pub trait Generator {
 }
 
 pub trait StaticGraph: Generator {
-    fn from_generator<T: Generator>(gen: T) -> Self;
+    fn from_generator<T: Generator>(gen: &T) -> Self;
 
     fn num_nodes(&self) -> usize;
     fn num_edges(&self) -> usize;

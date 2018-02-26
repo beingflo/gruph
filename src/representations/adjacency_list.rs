@@ -20,7 +20,7 @@ impl Generator for AdjacencyList {
 }
 
 impl StaticGraph for AdjacencyList {
-    fn from_generator<T: Generator>(gen: T) -> Self {
+    fn from_generator<T: Generator>(gen: &T) -> Self {
         let mut al = AdjacencyList::new();
 
         for e in gen.edges() {

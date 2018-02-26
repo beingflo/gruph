@@ -7,7 +7,7 @@ use Edge;
 use representations::AdjacencyList;
 use representations::EdgeList;
 
-use generators::erdos;
+use generators::Erdos;
 
 // AdjacencyList
 #[test]
@@ -260,7 +260,7 @@ fn to_edgelist<T: Graph>() {
     }
 
     let edges = graph.edges().collect::<Vec<Edge>>();
-    let edgelist = EdgeList::from_generator(graph);
+    let edgelist = EdgeList::from_generator(&graph);
     let edges_edgelist = edgelist.edges().collect::<Vec<Edge>>();
 
     assert_eq!(edges, edges_edgelist);
@@ -276,7 +276,7 @@ fn to_adjacencylist<T: Graph>() {
     }
 
     let edges = graph.edges().collect::<Vec<Edge>>();
-    let adjacencylist = AdjacencyList::from_generator(graph);
+    let adjacencylist = AdjacencyList::from_generator(&graph);
     let edges_adjacencylist = adjacencylist.edges().collect::<Vec<Edge>>();
 
     assert_eq!(edges, edges_adjacencylist);
@@ -284,11 +284,11 @@ fn to_adjacencylist<T: Graph>() {
 
 #[test]
 fn conversion_bfs() {
-    let mut al = AdjacencyList::new();
-    erdos(&mut al, 1000, 0.01);
+    let erdos = Erdos::new(1000, 0.01);
+    let al = AdjacencyList::from_generator(&erdos);
 
     let pred_al = al.breadth_first_search(123);
-    let el = EdgeList::from_generator(al);
+    let el = EdgeList::from_generator(&al);
     let pred_el = el.breadth_first_search(123);
 
     assert_eq!(pred_al, pred_el);
