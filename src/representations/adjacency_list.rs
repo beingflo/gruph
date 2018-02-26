@@ -1,4 +1,5 @@
-use AccessGraph;
+use Generator;
+use StaticGraph;
 use Graph;
 use Node;
 use Edge;
@@ -12,11 +13,17 @@ pub struct AdjacencyList {
     num_nodes: usize,
 }
 
-impl AccessGraph for AdjacencyList {
-    fn from_graph<T: Graph>(graph: &T) -> Self {
+impl Generator for AdjacencyList {
+    fn edges<'a>(&'a self) -> Box<Iterator<Item=Edge> + 'a> {
+        Box::new(self.adj.iter().enumerate().flat_map(|(u, vec)| vec.iter().map(move |v| Edge::new(u, *v))))
+    }
+}
+
+impl StaticGraph for AdjacencyList {
+    fn from_generator<T: Generator>(gen: T) -> Self {
         let mut al = AdjacencyList::new();
 
-        for e in graph.edges() {
+        for e in gen.edges() {
             al.add_edge(e.source(), e.target());
         }
 
@@ -62,8 +69,9 @@ impl AccessGraph for AdjacencyList {
         }
     }
 
-    fn edges<'a>(&'a self) -> Box<Iterator<Item=Edge> + 'a> {
-        Box::new(self.adj.iter().enumerate().flat_map(|(u, vec)| vec.iter().map(move |v| Edge::new(u, *v))))
+    fn clear(&mut self) {
+        self.adj.clear();
+        self.num_nodes = 0;
     }
 }
 
@@ -83,10 +91,5 @@ impl Graph for AdjacencyList {
 
         self.num_nodes = cmp::max(self.num_nodes, from);
         self.num_nodes = cmp::max(self.num_nodes, to);
-    }
-
-    fn clear(&mut self) {
-        self.adj.clear();
-        self.num_nodes = 0;
     }
 }

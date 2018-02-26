@@ -1,4 +1,4 @@
-use algorithms::breadth_first_search;
+use algorithms::*;
 
 pub type Node = usize;
 
@@ -19,8 +19,12 @@ impl Edge {
     }
 }
 
-pub trait AccessGraph {
-    fn from_graph<T: Graph>(graph: &T) -> Self where Self: Sized;
+pub trait Generator {
+    fn edges<'a>(&'a self) -> Box<Iterator<Item=Edge> + 'a>;
+}
+
+pub trait StaticGraph: Generator {
+    fn from_generator<T: Generator>(gen: T) -> Self;
 
     fn num_nodes(&self) -> usize;
     fn num_edges(&self) -> usize;
@@ -28,15 +32,15 @@ pub trait AccessGraph {
     fn has_edge(&self, from: Node, to: Node) -> bool;
 
     fn neighbors<'a>(&'a self, from: Node) -> Box<Iterator<Item=Node> + 'a>;
-    fn edges<'a>(&'a self) -> Box<Iterator<Item=Edge> + 'a>;
 
     fn breadth_first_search(&self, start: Node) -> Vec<Option<Node>> where Self: Sized {
         breadth_first_search(self, start)
     }
+
+    fn clear(&mut self);
 }
 
-pub trait Graph : AccessGraph {
+pub trait Graph : StaticGraph {
     fn new() -> Self;
     fn add_edge(&mut self, from: Node, to: Node);
-    fn clear(&mut self);
 }

@@ -1,4 +1,5 @@
-use AccessGraph;
+use Generator;
+use StaticGraph;
 use Graph;
 use Node;
 use Edge;
@@ -10,11 +11,17 @@ pub struct EdgeList {
     edges: Vec<Edge>,
 }
 
-impl AccessGraph for EdgeList {
-    fn from_graph<T: Graph>(graph: &T) -> Self {
+impl Generator for EdgeList {
+    fn edges<'a>(&'a self) -> Box<Iterator<Item=Edge> + 'a> {
+        Box::new(self.edges.iter().map(|&e| e))
+    }
+}
+
+impl StaticGraph for EdgeList {
+    fn from_generator<T: Generator>(gen: T) -> Self {
         let mut el = EdgeList::new();
 
-        for e in graph.edges() {
+        for e in gen.edges() {
             el.add_edge(e.source(), e.target());
         }
 
@@ -53,10 +60,9 @@ impl AccessGraph for EdgeList {
         Box::new(self.edges.iter().filter(move |e| e.source() == vertex).map(|e| e.target()))
     }
 
-    fn edges<'a>(&'a self) -> Box<Iterator<Item=Edge> + 'a> {
-        Box::new(self.edges.iter().map(|&e| e))
+    fn clear(&mut self) {
+        self.edges.clear();
     }
-
 }
 
 impl Graph for EdgeList {
@@ -66,9 +72,5 @@ impl Graph for EdgeList {
 
     fn add_edge(&mut self, from: Node, to: Node) {
         self.edges.push(Edge::new(from, to));
-    }
-
-    fn clear(&mut self) {
-        self.edges.clear();
     }
 }

@@ -1,9 +1,9 @@
-use AccessGraph;
+use StaticGraph;
 use Node;
 
 use std::collections::VecDeque;
 
-pub fn breadth_first_search<T: AccessGraph>(graph: &T, start: Node) -> Vec<Option<Node>> {
+pub fn breadth_first_search<T: StaticGraph>(graph: &T, start: Node) -> Vec<Option<Node>> {
     let mut q = VecDeque::new();
     let mut pred = vec![None; graph.num_nodes()];
 
@@ -25,7 +25,7 @@ pub fn breadth_first_search<T: AccessGraph>(graph: &T, start: Node) -> Vec<Optio
 
 #[cfg(test)]
 mod tests {
-    use AccessGraph;
+    use StaticGraph;
     use Graph;
 
     use representations::EdgeList;

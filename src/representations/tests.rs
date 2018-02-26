@@ -1,4 +1,5 @@
-use AccessGraph;
+use Generator;
+use StaticGraph;
 use Graph;
 use Node;
 use Edge;
@@ -259,7 +260,7 @@ fn to_edgelist<T: Graph>() {
     }
 
     let edges = graph.edges().collect::<Vec<Edge>>();
-    let edgelist = EdgeList::from_graph(&graph);
+    let edgelist = EdgeList::from_generator(graph);
     let edges_edgelist = edgelist.edges().collect::<Vec<Edge>>();
 
     assert_eq!(edges, edges_edgelist);
@@ -275,7 +276,7 @@ fn to_adjacencylist<T: Graph>() {
     }
 
     let edges = graph.edges().collect::<Vec<Edge>>();
-    let adjacencylist = AdjacencyList::from_graph(&graph);
+    let adjacencylist = AdjacencyList::from_generator(graph);
     let edges_adjacencylist = adjacencylist.edges().collect::<Vec<Edge>>();
 
     assert_eq!(edges, edges_adjacencylist);
@@ -287,7 +288,7 @@ fn conversion_bfs() {
     erdos(&mut al, 1000, 0.01);
 
     let pred_al = al.breadth_first_search(123);
-    let el = EdgeList::from_graph(&al);
+    let el = EdgeList::from_generator(al);
     let pred_el = el.breadth_first_search(123);
 
     assert_eq!(pred_al, pred_el);
