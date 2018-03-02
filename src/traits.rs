@@ -23,7 +23,7 @@ pub trait Generator {
     fn edges<'a>(&'a self) -> Box<Iterator<Item=Edge> + 'a>;
 }
 
-pub trait StaticGraph: Generator {
+pub trait StaticGraph : Generator {
     fn from_generator<T: Generator>(gen: &T) -> Self;
 
     fn num_nodes(&self) -> usize;
@@ -33,11 +33,19 @@ pub trait StaticGraph: Generator {
 
     fn neighbors<'a>(&'a self, from: Node) -> Box<Iterator<Item=Node> + 'a>;
 
+    fn clear(&mut self);
+
     fn breadth_first_search(&self, start: Node) -> Vec<Option<Node>> where Self: Sized {
         breadth_first_search(self, start)
     }
 
-    fn clear(&mut self);
+    fn is_bipartite(&self) -> bool where Self: Sized {
+        is_bipartite(self)
+    }
+
+    fn has_cycle(&self) -> bool where Self: Sized {
+        has_cycle(self)
+    }
 }
 
 pub trait Graph : StaticGraph {

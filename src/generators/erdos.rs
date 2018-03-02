@@ -5,17 +5,17 @@ use Edge;
 
 use self::rand::Rng;
 
-pub struct Erdos {
-    n: usize,
-    p: f64,
-}
-
 ///
 /// Constructs an [Erdős–Rényi random
 /// graph](https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model)
 /// with **n** nodes and an edge probability
 /// of **p**.
 ///
+pub struct Erdos {
+    n: usize,
+    p: f64,
+}
+
 impl Erdos {
     pub fn new(n: usize, p: f64) -> Erdos {
         Erdos { n, p }
