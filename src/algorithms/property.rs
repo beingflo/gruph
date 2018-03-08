@@ -1,11 +1,64 @@
 use StaticGraph;
 
+use std::collections::VecDeque;
+
 pub fn is_bipartite<T: StaticGraph>(graph: &T) -> bool {
-    unimplemented!()
+    if graph.num_nodes() <= 1 {
+        return true;
+    }
+
+    let mut q = VecDeque::new();
+
+    let mut color: Vec<Option<bool>> = vec![None; graph.num_nodes()];
+    let mut visited = vec![false; graph.num_nodes()];
+
+    visited[0] = true;
+    color[0] = Some(true);
+
+    q.push_front(0);
+
+    while !q.is_empty() {
+        let v = q.pop_back().unwrap();
+        for u in graph.neighbors(v) {
+            if visited[u] == false {
+                color[u] = Some(!color[v].unwrap());
+                visited[u] = true;
+                q.push_front(u);
+            } else {
+                if color[v] == color[u] {
+                    return false;
+                }
+            }
+        }
+    }
+
+    true
 }
 
 pub fn has_cycle<T: StaticGraph>(graph: &T) -> bool {
-    unimplemented!()
+    if graph.num_nodes() <= 0 {
+        return false;
+    }
+
+    let mut q = VecDeque::new();
+    let mut visited = vec![false; graph.num_nodes()];
+
+    visited[0] = true;
+
+    q.push_front(0);
+
+    while !q.is_empty() {
+        let v = q.pop_back().unwrap();
+        for u in graph.neighbors(v) {
+            if visited[u] == true {
+                return true;
+            }
+            visited[u] = true;
+            q.push_front(u);
+        }
+    }
+
+    false
 }
 
 #[cfg(test)]
@@ -63,7 +116,7 @@ mod tests {
         }
 
         assert_eq!(graph.is_bipartite(), true);
-        assert_eq!(graph.has_cycle(), true);
+        assert_eq!(graph.has_cycle(), false);
     }
 
 
@@ -77,9 +130,10 @@ mod tests {
             }
         }
 
-        graph.add_edge(12, 42);
+        graph.add_edge(70, 89);
+        graph.add_edge(70, 12);
 
-        assert_eq!(graph.is_bipartite(), true);
+        assert_eq!(graph.is_bipartite(), false);
         assert_eq!(graph.has_cycle(), true);
     }
 }

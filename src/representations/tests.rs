@@ -35,6 +35,7 @@ fn creation_adjacencylist() {
     assert_eq!(graph.num_nodes(), 2);
 }
 
+#[test]
 fn creation_csr() {
     let mut graph = EdgeList::new();
     graph.add_edge(0,1);
@@ -55,11 +56,12 @@ fn add_edges_edgelist() {
     graph.add_edge(1,0);
     graph.add_edge(2,5);
     graph.add_edge(0,3);
+    graph.add_edge(5,4);
 
     assert!(graph.has_edge(2,5));
     assert!(!graph.has_edge(5,2));
     assert!(!graph.has_edge(3,2));
-    assert_eq!(graph.num_edges(), 4);
+    assert_eq!(graph.num_edges(), 5);
     assert_eq!(graph.num_nodes(), 6);
 }
 
@@ -71,14 +73,16 @@ fn add_edges_adjacencylist() {
     graph.add_edge(1,0);
     graph.add_edge(2,5);
     graph.add_edge(0,3);
+    graph.add_edge(5,4);
 
     assert!(graph.has_edge(2,5));
     assert!(!graph.has_edge(5,2));
     assert!(!graph.has_edge(3,2));
-    assert_eq!(graph.num_edges(), 4);
+    assert_eq!(graph.num_edges(), 5);
     assert_eq!(graph.num_nodes(), 6);
 }
 
+#[test]
 fn add_edges_csr() {
     let mut graph = EdgeList::new();
 
@@ -86,13 +90,14 @@ fn add_edges_csr() {
     graph.add_edge(1,0);
     graph.add_edge(2,5);
     graph.add_edge(0,3);
+    graph.add_edge(5,4);
 
     let graph = Csr::from_generator(&graph);
 
     assert!(graph.has_edge(2,5));
     assert!(!graph.has_edge(5,2));
     assert!(!graph.has_edge(3,2));
-    assert_eq!(graph.num_edges(), 4);
+    assert_eq!(graph.num_edges(), 5);
     assert_eq!(graph.num_nodes(), 6);
 }
 
@@ -129,6 +134,7 @@ fn add_many_edges_adjacencylist() {
     assert_eq!(graph.num_nodes(), 1000);
 }
 
+#[test]
 fn add_many_edges_csr() {
     let mut graph = EdgeList::new();
 
@@ -190,6 +196,7 @@ fn clear_graph_adjacencylist() {
     assert_eq!(graph.num_nodes(), 0);
 }
 
+#[test]
 fn clear_graph_csr() {
     let mut graph = EdgeList::new();
 
@@ -243,6 +250,7 @@ fn duplicate_edge_adjacencylist() {
     assert_eq!(graph.num_nodes(), 2);
 }
 
+#[test]
 fn duplicate_edge_csr() {
     let mut graph = EdgeList::new();
 
@@ -254,7 +262,7 @@ fn duplicate_edge_csr() {
     let graph = Csr::from_generator(&graph);
 
     assert!(graph.has_edge(0, 1));
-    assert!(graph.has_edge(1, 0));
+    assert!(!graph.has_edge(1, 0));
     assert_eq!(graph.num_edges(), 4);
     assert_eq!(graph.num_nodes(), 2);
 }
@@ -287,6 +295,7 @@ fn reverse_edge_adjacencylist() {
     assert_eq!(graph.num_edges(), 2);
 }
 
+#[test]
 fn reverse_edge_csr() {
     let mut graph = EdgeList::new();
 
@@ -326,6 +335,7 @@ fn neighbors_adjacencylist() {
     assert_eq!(graph.neighbors(0).collect::<Vec<Node>>(), vec![1,2,3]);
 }
 
+#[test]
 fn neighbors_csr() {
     let mut graph = EdgeList::new();
 
@@ -373,6 +383,7 @@ fn multi_neighbors_adjacencylist() {
     assert_eq!(graph.neighbors(2).collect::<Vec<Node>>(), vec![]);
 }
 
+#[test]
 fn multi_neighbors_csr() {
     let mut graph = EdgeList::new();
 
@@ -423,6 +434,7 @@ fn edges_adjacencylist() {
     assert_eq!(graph.edges().collect::<Vec<Edge>>().len(), 7);
 }
 
+#[test]
 fn edges_csr() {
     let mut graph = EdgeList::new();
 
@@ -457,6 +469,7 @@ fn to_edgelist_from_adjacecnylist() {
     assert_eq!(edges, edges_edgelist);
 }
 
+#[test]
 fn to_edgelist_from_csr() {
     let mut graph = EdgeList::new();
 
@@ -492,6 +505,7 @@ fn to_adjacencylist_from_edgelist() {
     assert_eq!(edges, edges_adjacencylist);
 }
 
+#[test]
 fn to_adjacencylist_csr() {
     let mut graph = EdgeList::new();
 

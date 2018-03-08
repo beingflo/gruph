@@ -6,7 +6,7 @@ use Edge;
 
 use std::cmp;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct EdgeList {
     edges: Vec<Edge>,
 }

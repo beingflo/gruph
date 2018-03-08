@@ -7,7 +7,7 @@ use Edge;
 use std::cmp;
 use std::iter;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AdjacencyList {
     adj: Vec<Vec<Node>>,
     num_nodes: usize,
