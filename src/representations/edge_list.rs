@@ -22,7 +22,7 @@ impl StaticGraph for EdgeList {
         let mut el = EdgeList::new();
 
         for e in gen.edges() {
-            el.add_edge(e.source(), e.target());
+            el.add_edge(e.u(), e.v());
         }
 
         el
@@ -31,8 +31,8 @@ impl StaticGraph for EdgeList {
     fn num_nodes(&self) -> usize {
         let mut max_node = 0;
         for e in &self.edges {
-            max_node = cmp::max(max_node, e.source());
-            max_node = cmp::max(max_node, e.target());
+            max_node = cmp::max(max_node, e.u());
+            max_node = cmp::max(max_node, e.v());
         }
 
         if self.edges.len() > 0 {
@@ -46,9 +46,9 @@ impl StaticGraph for EdgeList {
         self.edges.len()
     }
 
-    fn has_edge(&self, from: Node, to: Node) -> bool {
+    fn has_edge(&self, u: Node, v: Node) -> bool {
         for edge in &self.edges {
-            if edge.source() == from && edge.target() == to {
+            if edge.u() == u && edge.v() == v {
                 return true;
             }
         }
@@ -57,7 +57,7 @@ impl StaticGraph for EdgeList {
     }
 
     fn neighbors<'a>(&'a self, vertex: Node) -> Box<Iterator<Item=Node> + 'a> {
-        Box::new(self.edges.iter().filter(move |e| e.source() == vertex).map(|e| e.target()))
+        Box::new(self.edges.iter().filter(move |e| e.u() == vertex).map(|e| e.v()))
     }
 
     fn clear(&mut self) {
@@ -70,7 +70,7 @@ impl Graph for EdgeList {
         EdgeList { edges: vec![] }
     }
 
-    fn add_edge(&mut self, from: Node, to: Node) {
-        self.edges.push(Edge::new(from, to));
+    fn add_edge(&mut self, u: Node, v: Node) {
+        self.edges.push(Edge::new(u, v));
     }
 }

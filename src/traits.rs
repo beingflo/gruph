@@ -10,11 +10,11 @@ impl Edge {
         Edge(from, to)
     }
 
-    pub fn source(&self) -> Node {
+    pub fn u(&self) -> Node {
         self.0
     }
 
-    pub fn target(&self) -> Node {
+    pub fn v(&self) -> Node {
         self.1
     }
 }

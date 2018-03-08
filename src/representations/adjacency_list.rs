@@ -24,7 +24,7 @@ impl StaticGraph for AdjacencyList {
         let mut al = AdjacencyList::new();
 
         for e in gen.edges() {
-            al.add_edge(e.source(), e.target());
+            al.add_edge(e.u(), e.v());
         }
 
         al
